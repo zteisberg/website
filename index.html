@@ -53,18 +53,9 @@
     .fader {
         background-color: #050505 !important;
     }
-
-    .light-mode .fader {
-        background-color: #f5f5f5 !important;
-    }
     :root {
       --grid-color: rgba(121, 192, 255, 0.5); /* Blue-ish for dark mode */
     }
-
-    .light-mode {
-      --grid-color: rgba(0, 0, 0, 0.8); /* Soft dark lines for light mode */
-    }
-
     @keyframes grid-move {
       from { background-position: 0 0; }
       to { background-position: 0 40px; }
@@ -133,7 +124,7 @@
 <body id="main-body" class="dark min-h-screen p-4 md:p-8 transition-colors duration-500 flex items-center justify-center relative overflow-hidden">
   
         <!-- Light/Dark Compatible Moving Retro Grid -->
-        <div class="fixed inset-0 -z-10 bg-[#f5f5f5] dark:bg-[#050505] overflow-hidden transition-colors duration-500 fader">
+        <div class="fixed inset-0 -z-10 dark:bg-[#050505] overflow-hidden transition-colors duration-500 fader">
           <!-- Perspective Container -->
           <div class="absolute inset-0 [perspective:500px] [perspective-origin:50%_50%]">
             
