@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>~/dev/blog</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    .reversed {
+    unicode-bidi: bidi-override;
+    direction: rtl;
+    }
+    body { font-family: 'Fira Code', monospace; background-color: #0d1117; }
+    .cursor-blink { animation: blink 1s step-end infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+    .fade-in { animation: fadeIn 0.2s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    #command-input:focus { outline: none; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #0d1117; }
+    ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+    body { transition: background-color 0.3s ease, color 0.3s ease; color: #c9d1d9; }
+    
+    /* Light Mode Overrides */
+    .light-mode {
+      background-color: #f0f0f0 !important;
+      color: #1a1a1a !important;
+    }
+    .light-mode .rounded-b-lg {
+      background-color: #ffffff !important;
+      border-color: #d1d5db !important;
+    }
+    .light-mode .rounded-t-lg {
+      background-color: #e5e7eb !important;
+      border-color: #d1d5db !important;
+    }
+
+    .light-mode .button {
+      background-color: #1a1a1a !important;
+      border-color: #1a1a1a !important;
+    }
+
+    .light-mode input {
+      color: #1a1a1a !important;
+    }
+    .light-mode .bg-[#161b22] {
+      background-color: #f9fafb !important;
+      border-color: #d1d5db !important;
+    }
+    .fader {
+        background-color: #050505 !important;
+    }
+
+    .light-mode .fader {
+        background-color: #f5f5f5 !important;
+    }
+    :root {
+      --grid-color: rgba(121, 192, 255, 0.5); /* Blue-ish for dark mode */
+    }
+
+    .light-mode {
+      --grid-color: rgba(0, 0, 0, 0.8); /* Soft dark lines for light mode */
+    }
+
+    @keyframes grid-move {
+      from { background-position: 0 0; }
+      to { background-position: 0 40px; }
+    }
+    
+    .animate-grid {
+      animation: grid-move 1.5s linear infinite;
+      filter: drop-shadow(0 0 1px var(--grid-color));
+    }
+
+    @keyframes grid-move-reverse {
+      from { background-position: 0 40px; }
+      to { background-position: 0 0; }
+    }
+
+    .animate-grid-reverse {
+      animation: grid-move-reverse 1.5s linear infinite;
+      filter: drop-shadow(0 0 1px var(--grid-color));
+    }
+
+    .blog-list-item:hover {
+      background-color: #161b22;
+    }
+    .light-mode .blog-list-item:hover {
+      background-color: #f2f2f2;
+    }
+  </style>
+  <script>
+        tailwind.config = {
+      darkMode: 'class', // Enable class-based dark mode
+      theme: {
+        extend: {
+          colors: {
+            terminal: {
+                bg: '#0d1117',
+                header: '#161b22',
+                border: '#30363d',
+                fg: '#c9d1d9',
+                // Light Mode Alts
+                lBg: '#f0f0f0',
+                lHeader: '#e5e7eb',
+                lBorder: '#d1d5db',
+                lFg: '#1a1a1a',
+                // Accent Colors
+                blue: '#58a6ff',
+                cyan: '#79c0ff',
+                green: '#3fb950',
+                red: '#f85149',
+                orange: '#f0883e',
+                yellow: '#d29922',
+                purple: '#bc8cff',
+                pink: '#ff7b72',
+                
+                // Dim / Muted variants (Good for sub-text)
+                dimBlue: '#1f6feb',
+                dimGreen: '#238636',
+                dimPurple: '#8957e5',
+                dimOrange: '#bd5c14'
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body id="main-body" class="dark min-h-screen p-4 md:p-8 transition-colors duration-500 flex items-center justify-center relative overflow-hidden">
+  
+        <!-- Light/Dark Compatible Moving Retro Grid -->
+        <div class="fixed inset-0 -z-10 bg-[#f5f5f5] dark:bg-[#050505] overflow-hidden transition-colors duration-500 fader">
+          <!-- Perspective Container -->
+          <div class="absolute inset-0 [perspective:500px] [perspective-origin:50%_50%]">
+            
+            <!-- Top Grid -->
+            <div class="absolute inset-0 [transform:rotateX(-100deg)_translateY(-50%)] origin-top">
+              <div class="animate-grid-reverse absolute inset-0 bg-[linear-gradient(to_right,var(--grid-color)_1px,transparent_1px),linear-gradient(to_bottom,var(--grid-color)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:linear-gradient(to_bottom,black_20%,transparent_90%)]"></div>
+            </div>
+    
+            <!-- Bottom Grid -->
+            <div class="absolute inset-0 [transform:rotateX(100deg)_translateY(50%)] origin-bottom">
+              <div class="animate-grid absolute inset-0 bg-[linear-gradient(to_right,var(--grid-color)_1px,transparent_1px),linear-gradient(to_bottom,var(--grid-color)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:linear-gradient(to_top,black_20%,transparent_90%)]"></div>
+              
+              <!-- Subtle Floor Glow (Visible mostly in dark mode) -->
+              <div class="absolute inset-0 bg-gradient-to-t from-terminal-cyan/10 dark:from-terminal-cyan/20 via-transparent to-transparent"></div>
+            </div>
+          </div>
+    
+          <!-- Horizon Line -->
+          <div class="absolute top-1/2 left-0 w-full flex items-center justify-center">
+            <!-- Main Line: Cyan in dark mode, Grey in light mode -->
+            <div class="w-full h-[1px] bg-slate-400  shadow-[0_0_15px_rgba(121,192,255,0.0)] dark:shadow-[0_0_20px_rgba(121,192,255,1)]"></div>
+          </div>
+    
+          <!-- Ambient Background Elements - Dimmer in Light Mode -->
+          <div class="absolute top-[25%] left-[-5%] w-[50%] h-[40%] rounded-full bg-terminal-cyan/5 dark:bg-terminal-cyan/20 blur-[120px] animate-pulse"></div>
+          <div class="absolute bottom-[25%] right-[-5%] w-[50%] h-[40%] rounded-full bg-terminal-purple/5 dark:bg-terminal-purple/20 blur-[120px] animate-pulse" style="animation-delay: 2s;"></div>
+          
+          <!-- Noise Texture -->
+          <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 dark:opacity-30 mix-blend-overlay pointer-events-none"></div>
+        </div>
+  
+    <!-- Main Container -->
+    <div class="max-w-4xl w-full mx-auto relative z-10 drop-shadow-2xl">
+    <!-- Terminal Window -->
+    <div class="rounded-t-lg bg-[#161b22] px-4 py-2 flex items-center gap-2 border-b border-[#30363d]">
+      <div class="w-3 h-3 rounded-full bg-red-500"></div>
+      <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+      <div class="w-3 h-3 rounded-full bg-green-500"></div>
+      <span class="ml-4 text-sm">zach.teisberg@software</span>
+    </div>
+
+    <div class="rounded-b-lg bg-[#0d1117] border border-[#30363d] p-6 h-[600px] flex flex-col">
+      
+      <!-- Content Area (This gets replaced) -->
+      <div id="terminal-content" class="flex-1 overflow-y-auto mb-4">
+        <div id="welcome-screen" class="fade-in space-y-2">
+          <div class="text-terminal-green">
+            <span class="text-terminal-cyan">$</span> ./welcome.sh
+          </div>
+          <p class="text-terminal-fg text-xl font-bold">Welcome to my dev blog and portfolio.</p>
+          <p>Navigation is available via the command line or buttons below.</p>
+          <div class="border-t border-[#30363d] my-4 w-16"></div>
+          <p>Type 'help' to see all available commands.</p>
+        </div>
+      </div>
+
+      <!-- Persistent Input Section -->
+      <div class="mt-auto border-t border-[#30363d] pt-4">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-terminal-cyan font-bold">$</span>
+          <input 
+            type="text" 
+            id="command-input" 
+            class="flex-1 bg-transparent border-none focus:outline-none"
+            placeholder="Type a command..."
+            autocomplete="off"
+            autofocus
+          >
+          <span class="cursor-blink text-terminal-success">▊</span>
+        </div>
+
+        <div class="flex flex-wrap gap-2" id="nav-buttons">
+          <button onclick="executeCommand('about')" class="px-3 py-1 border border-[#30363d] hover:border-terminal-green hover:text-terminal-green transition-all rounded text-xs uppercase tracking-wider">About</button>
+          <button onclick="executeCommand('projects')" class="px-3 py-1 border border-[#30363d] hover:border-terminal-green hover:text-terminal-green transition-all rounded text-xs uppercase tracking-wider">Projects</button>
+          <button onclick="executeCommand('posts')" class="px-3 py-1 border border-[#30363d] hover:border-terminal-green hover:text-terminal-green transition-all rounded text-xs uppercase tracking-wider">Posts</button>
+          <button onclick="executeCommand('contact')" class="px-3 py-1 border border-[#30363d] hover:border-terminal-green hover:text-terminal-green transition-all rounded text-xs uppercase tracking-wider">Contact</button>
+          <button onclick="executeCommand('theme')" class="px-3 py-1 border border-[#30363d] hover:border-terminal-green hover:text-terminal-green transition-all rounded text-xs uppercase tracking-wider">Theme</button>
+          <button onclick="executeCommand('help')" class="px-3 py-1 border border-[#30363d] hover:border-terminal-green hover:text-terminal-green transition-all rounded text-xs uppercase tracking-wider underline decoration-terminal-cyan">Help</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Note: Make sure posts/posts-data.js exists or comment this out to use internal data -->
+  <script src="posts-data.js"></script>
+
+  <script>
+    // Internal Page Data
+    const pages = {
+      about: {
+        content: `
+          <div class="fade-in">
+            <h2 class="text-terminal-green text-xl mb-4 font-bold">> Who am I?</h2>
+            <div class="flex items-center gap-2 mb-4">
+                <span class="text-terminal-purple">user@dev:</span>
+                <span class="text-terminal-blue">~/about</span>
+                <span class="text-terminal-fg">$</span>
+                <span>open_media me.jpg</span>
+            </div>
+            <div class="pl-4 flex flex-col md:flex-row gap-8 items-start">
+        <!-- Image Container -->
+        <div class="relative group">
+          <!-- Decorative Terminal Frame -->
+          <div class="absolute -inset-1 bg-gradient-to-r from-terminal-blue to-terminal-purple rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+          
+          <div class="relative bg-terminal-header border border-terminal-border p-1 rounded-lg overflow-hidden">
+            <div class="bg-terminal-bg flex items-center justify-between px-2 py-1 border-b border-terminal-border">
+              <span class="text-[10px] font-mono italic">me.jpg (720x720)</span>
+              <div class="flex gap-1">
+                <div class="w-1.5 h-1.5 rounded-full bg-terminal-border"></div>
+                <div class="w-1.5 h-1.5 rounded-full bg-terminal-border"></div>
+              </div>
+            </div>
+            
+            <!-- The Image -->
+            <img 
+              src="img/me.jpg" 
+              alt="Profile" 
+              class="w-48 h-48 md:w-56 md:h-56 object-cover grayscale hover:grayscale-0 transition-all duration-500 rounded-b"
+            >
+            
+            <!-- Scanline Overlay Effect -->
+            <div class="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(0,255,0,0.01),rgba(0,0,255,0.03))] bg-[length:100%_2px,3px_100%]"></div>
+          </div>
+        </div>
+        </div>
+      </div>
+            <p class="pt-4 mb-4">I am a Full Stack Engineer/Architect specializing in microservices, devops, scaling, reverse engineering and high-performance backend systems.</p>
+            <div class="grid grid-cols-2 gap-4 mt-6">
+               <div class="border border-[#30363d] p-3">
+                  <p class="text-terminal-cyan text-sm">Location</p>
+                  <p>Portland, OR</p>
+               </div>
+               <div class="border border-[#30363d] p-3">
+                  <p class="text-terminal-cyan text-sm">Experience</p>
+                  <p>10+ Years</p>
+               </div>
+               <div class="border border-[#30363d] p-3">
+                  <p class="text-terminal-cyan text-sm">Languages</p>
+                  <p>Python, Javascript, Java, Ruby, C#</p>
+               </div>
+               <div class="border border-[#30363d] p-3">
+                  <p class="text-terminal-cyan text-sm">Other Technology</p>
+                  <p>Docker, Kubernetes, AWS, RabbitMQ, Terraform</p>
+               </div>
+            </div>
+          </div>
+        `
+      },
+      projects: {
+        content: `
+          <div class="fade-in">
+            <h2 class="text-terminal-green text-xl mb-4 font-bold">> Recent Builds</h2>
+            <div class="space-y-4">
+              <a href="https://github.com/zteisberg/elden_twitch">
+                <div class="group border-l-2 border-terminal-cyan pl-4 py-1">
+                    <p class="font-bold">Elden Twitch</p>
+                    <p class="text-sm">A tool to allow your Twitch Chat to interact with your Elden Ring Playthrough.</p>
+                </div>
+              </a>
+              <a class="pt-4" href="https://zteisberg.github.io/zoogle/">
+              <div class="group border-l-2 border-terminal-yellow pl-4 py-1">
+                <p class="font-bold">Zoogle</p>
+                <p class="text-sm">A search engine with !bang support, forked from t3's unduck</p>
+              </div>
+              </a>
+            </div>
+          </div>
+        `
+      },
+      contact: {
+        content: `
+          <div class="fade-in">
+            <h2 class="text-terminal-magenta text-xl mb-4 font-bold">> Connect</h2>
+            <ul class="space-y-2">
+              <li><span class="text-terminal-cyan">Email:</span> <span class="reversed">moc.liamg@grebsietz</span></li>
+              <li><span class="text-terminal-cyan">GitHub:</span> <span class="reversed">grebsietz/moc.buhtig</span></li>
+              <li><span class="text-terminal-cyan">LinkedIn:</span> <span class="reversed">0826baa1-grebsiet-hcaz/ni/moc.nideknil</span></li>
+            </ul>
+          </div>
+        `
+      },
+      help: {
+        content: `
+          <div class="fade-in">
+            <h2 class="text-terminal-yellow text-xl mb-4 font-bold">> Available Commands</h2>
+            <div class="grid grid-cols-2 gap-2 text-sm">
+              <div class="text-terminal-cyan">about</div><div>Information about me</div>
+              <div class="text-terminal-cyan">projects</div><div>View my portfolio</div>
+              <div class="text-terminal-cyan">posts</div><div>Read my blog entries</div>
+              <div class="text-terminal-cyan">contact</div><div>Get in touch</div>
+              <div class="text-terminal-cyan">clear</div><div>Reset the terminal</div>
+              <div class="text-terminal-cyan">read [id]</div><div>View a specific post</div>
+              <div class="text-terminal-cyan">theme</div><div>Toggle Dark/Light mode</div>
+            </div>
+          </div>
+        `
+      }
+    };
+
+    const commandInput = document.getElementById('command-input');
+    const contentArea = document.getElementById('terminal-content');
+
+    function toggleTheme() {
+      const body = document.body;
+      body.classList.toggle('light-mode');
+      
+      const isLight = body.classList.contains('light-mode');
+      renderPage(`
+        <div class="fade-in">
+          <p class="text-terminal-green">System theme updated.</p>
+          <p>Current mode: <span class="font-bold">${isLight ? 'LIGHT' : 'DARK'}</span></p>
+        </div>
+      `);
+      commandInput.value = '';
+    }
+
+    function executeCommand(cmd) {
+      const input = cmd.toLowerCase().trim();
+      const parts = input.split(' ');
+      const command = parts[0];
+      const arg = parts[1];
+
+      if (command === 'theme') {
+        toggleTheme();
+        return;
+      }
+
+      if (command === 'clear') {
+        contentArea.innerHTML = '<p class="text-sm">Terminal screen cleared. Type "help" to see options.</p>';
+      } else if (command === 'posts') {
+        renderPostsList();
+      } else if (command === 'read') {
+        renderSinglePost(arg);
+      } else if (pages[command]) {
+        renderPage(pages[command].content);
+      } else if (input !== "") {
+        renderPage(`
+          <div class="text-red-500 font-bold mb-2">Command not found: ${command}</div>
+          <p class="text-sm">Type 'help' to see available commands.</p>
+        `);
+      }
+      
+      commandInput.value = '';
+    }
+
+    function renderPage(html) {
+      contentArea.innerHTML = html;
+      contentArea.scrollTop = 0;
+    }
+
+    function renderPostsList() {
+      // If the 'posts' data from external file is missing, we use a fallback
+      const data = (typeof posts !== 'undefined') ? posts : {
+        1: { title: "Hello World", date: "2024-01-01", excerpt: "Sample post..." }
+      };
+
+      let html = `<h2 class="text-terminal-green text-xl mb-4 font-bold">> Blog Archive</h2><div class="space-y-4">`;
+      for (const [id, post] of Object.entries(data).sort((a, b) => {return b[1].date.localeCompare(a[1].date);})) 
+      {
+        html += `
+          <div class="blog-list-item border border-[#30363d] p-3 cursor-pointer" onclick="executeCommand('read ${id}')">
+            <p class="text-terminal-cyan font-bold">${id}: ${post.title}</p>
+            <p class="text-xs">${post.date}</p>
+            <p class="italic">${post.tagline}</p>
+          </div>
+        `;
+      }
+      html += `</div>`;
+      renderPage(html);
+    }
+
+    function renderSinglePost(id) {
+      if (typeof posts === 'undefined' || !posts[id]) {
+        renderPage(`<p class="text-red-500">Post ID ${id || ''} not found. Type 'posts' to see list.</p>`);
+        return;
+      }
+      const post = posts[id];
+      renderPage(`
+        <div class="fade-in">
+          <button onclick="executeCommand('posts')" class="text-terminal-yellow text-xs mb-4 hover:underline"><- Back to list</button>
+          <h1 class="text-terminal-green text-2xl font-bold mb-1">${post.title}</h1>
+          <p class="text-xs mb-6">Published on ${post.date}</p>
+          <div class="leading-relaxed">${post.content}</div>
+        </div>
+      `);
+    }
+
+    // Input Handlers
+    commandInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') executeCommand(commandInput.value);
+    });
+
+        // Auto-focus logic
+        document.addEventListener('click', () => commandInput.focus());
+        document.addEventListener("copy", (event) => {
+    // Check if the user is copying text inside an element with the 'reversed' class
+    // We check the 'anchorNode' of the current selection
+    const selection = window.getSelection();
+    if (!selection.rangeCount) return;
+
+    const container = selection.anchorNode.parentElement;
+
+    if (container && container.classList.contains("reversed")) {
+        const selectedText = selection.toString();
+        
+        // Reverse the string back to normal
+        const correctedText = selectedText.split("").reverse().join("");
+
+        // Set the clipboard data and skip the browser's default behavior
+        event.clipboardData.setData("text/plain", correctedText);
+        event.preventDefault();
+    }
+    });
+  </script>
+</body>
+</html>
